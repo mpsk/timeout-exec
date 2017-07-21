@@ -1,57 +1,65 @@
 export type SandboxTimers = {
-	[key: string]: Array<number>
+	[key: string]: Array<number>;
 };
 
-const create = (key: string, timeIntervalId: any, sandbox: SandboxTimers) => {
-	const interval = {key: timeIntervalId};
-	if (typeof sandbox[key] === 'undefined') {
-		sandbox[key] = [];
-	}
-	sandbox[key].push(timeIntervalId);
-	return timeIntervalId;
-};
+export interface IClear {
+	clear(): void;
+}
+export interface IExecutor extends IClear {
+	execute(resolve: Function): IClear;
+}
 
-const remove = (key, id, sandbox) => {
-	sandbox[key].splice(sandbox[key].indexOf(id), 1);
-};
+const DEFAULT_KEY = 'no_name';
 
-class Timeout {
+export default class Timeout {
 	private _sandbox: SandboxTimers;
 
 	constructor() {
 		this._sandbox = {};
 	}
 
-	timer(ms: number, key: string) {
+	timer(ms: number, key: string = DEFAULT_KEY): IExecutor {
 		let timeoutId;
-		const promise = new Promise((resolve) => {
-			timeoutId = setTimeout(() => {
-				resolve.call(null);
-				remove(key, timeoutId, this._sandbox);	
-			}, ms);
-			create(key, timeoutId, this._sandbox);
-		});
-		promise['clear'] = () => {
+		const sandbox = this._sandbox;
+
+		const clear = () => {
 			clearTimeout(timeoutId);
-			remove(key, timeoutId, this._sandbox);
+			remove(key, timeoutId, sandbox);
 		};
-		return promise;
+
+		return {
+			execute(resolve: Function) {
+				timeoutId = setTimeout(() => {
+					resolve();
+					remove(key, timeoutId, sandbox);
+				}, ms);
+				create(key, timeoutId, sandbox);
+				return {clear};
+			},
+			clear: clear
+		}
 	}
 
-	interval(ms: number, key: string) {
+	interval(ms: number, key: string = DEFAULT_KEY): IExecutor {
 		let intervalId;
-		const promise = new Promise((resolve) => {
-			intervalId = setInterval(resolve, ms);
-			create(key, intervalId, this._sandbox);
-		});
-		promise['clear'] = () => {
+		const sandbox = this._sandbox;
+
+		const clear = () => {
 			clearInterval(intervalId);
-			remove(key, intervalId, this._sandbox);
+			remove(key, intervalId, sandbox);
 		};
-		return promise;
+
+		return {
+			execute(resolve: Function) {
+				intervalId = setInterval(resolve, ms);
+				create(key, intervalId, sandbox);
+				return {clear};
+			},
+			clear: clear
+		}
 	}
 
-	clearKey(key: string): SandboxTimers {
+	clearKey(key: string = DEFAULT_KEY): SandboxTimers {
 		if (this._sandbox[key]) {
 			this._sandbox[key].forEach(id => clearInterval(id));
 			delete this._sandbox[key];
@@ -66,4 +74,15 @@ class Timeout {
 	}
 }
 
-export default Timeout;
+function create(key: string, timeIntervalId: any, sandbox: SandboxTimers) {
+	const interval = {key: timeIntervalId};
+	if (typeof sandbox[key] === 'undefined') {
+		sandbox[key] = [];
+	}
+	sandbox[key].push(timeIntervalId);
+	return timeIntervalId;
+};
+
+function remove(key, id, sandbox) {
+	sandbox[key].splice(sandbox[key].indexOf(id), 1);
+};

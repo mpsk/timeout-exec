@@ -1,13 +1,23 @@
 {
-  "name": "timeout-manager",
-  "version": "1.0.0",
-  "description": "timeout manager promise",
+  "name": "timeout-exec",
+  "version": "1.0.3",
+  "description": "timeout manager executor",
   "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "scripts": {
     "clear": "rm -rf dist",
-    "build": "./node_modules/.bin/tsc --pretty"
+    "build": "./node_modules/.bin/tsc --pretty",
+    "dev": "./node_modules/.bin/tsc --pretty -w"
   },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mpsk/timeout-exec.git"
+  },
+  "files": [
+    "dist"
+  ],
   "keywords": [
+    "time",
     "timeout",
     "manager",
     "timer",
@@ -15,8 +25,12 @@
     "setTimeout",
     "setInterval",
     "promise",
+    "manage-timeouts",
+    "manage-intervals",
+    "execute",
     "key",
     "destroy",
+    "clear",
     "service"
   ],
   "author": {
@@ -25,7 +39,7 @@
   },
   "license": "ISC",
   "devDependencies": {
-    "typescript": "^2.4.2"
+    "typescript": "2.4.2"
   },
   "dependencies": {
   }
