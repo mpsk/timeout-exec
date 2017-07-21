@@ -1,0 +1,22 @@
+{
+    "compilerOptions": {
+		"outDir": "dist",
+		"outFile":"dist/index.js",
+        "module": "amd",
+		"target": "es5",
+		"declaration": true,
+		"lib": [
+			"es5",
+			"es6",
+			"dom"
+		]
+	},
+    "files": [
+        "./src/Timeout.ts"
+    ],
+    "exclude": [
+        "node_modules", 
+        "dist"
+    ]
+
+}

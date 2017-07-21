@@ -1,0 +1,32 @@
+{
+  "name": "timeout-manager",
+  "version": "1.0.0",
+  "description": "timeout manager promise",
+  "main": "dist/index.js",
+  "scripts": {
+    "clear": "rm -rf dist",
+    "build": "./node_modules/.bin/tsc --pretty"
+  },
+  "keywords": [
+    "timeout",
+    "manager",
+    "timer",
+    "interval",
+    "setTimeout",
+    "setInterval",
+    "promise",
+    "key",
+    "destroy",
+    "service"
+  ],
+  "author": {
+    "name": "Mykola P.",
+    "email": "m.piskovyi@gmail.com"
+  },
+  "license": "ISC",
+  "devDependencies": {
+    "typescript": "^2.4.2"
+  },
+  "dependencies": {
+  }
+}
