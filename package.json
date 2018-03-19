@@ -1,6 +1,6 @@
 {
   "name": "timeout-exec",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "timeout manager executor",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -41,6 +41,5 @@
   "devDependencies": {
     "typescript": "2.4.2"
   },
-  "dependencies": {
-  }
+  "dependencies": {}
 }
