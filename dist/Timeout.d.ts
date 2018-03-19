@@ -1,5 +1,9 @@
+export declare type SandboxTimerItem = {
+    id: number;
+    type: 'timeout' | 'interval';
+};
 export declare type SandboxTimers = {
-    [key: string]: Array<number>;
+    [key: string]: Array<SandboxTimerItem>;
 };
 export interface IClear {
     clear(): void;

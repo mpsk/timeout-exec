@@ -1,5 +1,10 @@
+export type SandboxTimerItem = {
+	id: number;
+	type: 'timeout'|'interval';
+}
+
 export type SandboxTimers = {
-	[key: string]: Array<number>;
+	[key: string]: Array<SandboxTimerItem>;
 };
 
 export interface IClear {
@@ -20,20 +25,21 @@ export default class Timeout {
 
 	timer(ms: number, key: string = DEFAULT_KEY): IExecutor {
 		let timeoutId;
+		const type = 'timeout';
 		const sandbox = this._sandbox;
 
 		const clear = () => {
 			clearTimeout(timeoutId);
-			remove(key, timeoutId, sandbox);
+			remove(key, sandbox, timeoutId, type);
 		};
 
 		return {
 			execute(resolve: Function) {
 				timeoutId = setTimeout(() => {
 					resolve();
-					remove(key, timeoutId, sandbox);
+					remove(key, sandbox, timeoutId, type);
 				}, ms);
-				create(key, timeoutId, sandbox);
+				create(key, sandbox, {id: timeoutId, type});
 				return {clear};
 			},
 			clear: clear
@@ -42,17 +48,18 @@ export default class Timeout {
 
 	interval(ms: number, key: string = DEFAULT_KEY): IExecutor {
 		let intervalId;
+		const type = 'interval';
 		const sandbox = this._sandbox;
 
 		const clear = () => {
 			clearInterval(intervalId);
-			remove(key, intervalId, sandbox);
+			remove(key, sandbox, intervalId, type);
 		};
 
 		return {
 			execute(resolve: Function) {
 				intervalId = setInterval(resolve, ms);
-				create(key, intervalId, sandbox);
+				create(key, sandbox, {id: intervalId, type});
 				return {clear};
 			},
 			clear: clear
@@ -61,7 +68,14 @@ export default class Timeout {
 
 	clearKey(key: string = DEFAULT_KEY): SandboxTimers {
 		if (this._sandbox[key]) {
-			this._sandbox[key].forEach(id => clearInterval(id));
+			this._sandbox[key].forEach((item) => {
+				if (item.type === 'timeout') {
+					clearTimeout(item.id);
+				}
+				if (item.type === 'interval') {
+					clearInterval(item.id);
+				}
+			});
 			delete this._sandbox[key];
 		}
 
@@ -69,20 +83,20 @@ export default class Timeout {
 	}
 
 	destroy(): SandboxTimers {
-		Object.keys(this._sandbox).forEach(this.clearKey);
+		Object.keys(this._sandbox).forEach(this.clearKey.bind(this));
 		return this._sandbox;
 	}
 }
 
-function create(key: string, timeIntervalId: any, sandbox: SandboxTimers) {
-	const interval = {key: timeIntervalId};
+function create(key: string, sandbox: SandboxTimers, timeItem: SandboxTimerItem) {
 	if (typeof sandbox[key] === 'undefined') {
 		sandbox[key] = [];
 	}
-	sandbox[key].push(timeIntervalId);
-	return timeIntervalId;
+	sandbox[key].push(timeItem);
+	return sandbox;
 };
 
-function remove(key, id, sandbox) {
-	sandbox[key].splice(sandbox[key].indexOf(id), 1);
+function remove(key: string, sandbox: SandboxTimers, id: number, type) {
+	const item = sandbox[key].find(item => item.type === type && item.id === id);
+	sandbox[key].splice(sandbox[key].indexOf(item), 1);
 };
