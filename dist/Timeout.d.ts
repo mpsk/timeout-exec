@@ -1,21 +1,23 @@
+export declare enum TimerType {
+    timeout = "timeout",
+    interval = "interval"
+}
 export declare type SandboxTimerItem = {
     id: number;
-    type: 'timeout' | 'interval';
+    type: TimerType;
 };
-export declare type SandboxTimers = {
-    [key: string]: Array<SandboxTimerItem>;
-};
-export interface IClear {
+export declare type SandboxTimers = Record<string, SandboxTimerItem[]>;
+export interface Clear {
     clear(): void;
 }
-export interface IExecutor extends IClear {
-    execute(resolve: Function): IClear;
+export interface Executor extends Clear {
+    execute(resolve: Function): Clear;
 }
 export default class Timeout {
     private _sandbox;
     constructor();
-    timer(ms: number, key?: string): IExecutor;
-    interval(ms: number, key?: string): IExecutor;
+    timer(ms: number, key?: string): Executor;
+    interval(ms: number, key?: string): Executor;
     clearKey(key?: string): SandboxTimers;
     destroy(): SandboxTimers;
 }

@@ -1,14 +1,19 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+var TimerType;
+(function (TimerType) {
+    TimerType["timeout"] = "timeout";
+    TimerType["interval"] = "interval";
+})(TimerType = exports.TimerType || (exports.TimerType = {}));
 var DEFAULT_KEY = 'no_name';
-var Timeout = (function () {
+var Timeout = /** @class */ (function () {
     function Timeout() {
         this._sandbox = {};
     }
     Timeout.prototype.timer = function (ms, key) {
         if (key === void 0) { key = DEFAULT_KEY; }
         var timeoutId;
-        var type = 'timeout';
+        var type = TimerType.timeout;
         var sandbox = this._sandbox;
         var clear = function () {
             clearTimeout(timeoutId);
@@ -29,7 +34,7 @@ var Timeout = (function () {
     Timeout.prototype.interval = function (ms, key) {
         if (key === void 0) { key = DEFAULT_KEY; }
         var intervalId;
-        var type = 'interval';
+        var type = TimerType.interval;
         var sandbox = this._sandbox;
         var clear = function () {
             clearInterval(intervalId);
@@ -48,11 +53,16 @@ var Timeout = (function () {
         if (key === void 0) { key = DEFAULT_KEY; }
         if (this._sandbox[key]) {
             this._sandbox[key].forEach(function (item) {
-                if (item.type === 'timeout') {
-                    clearTimeout(item.id);
-                }
-                if (item.type === 'interval') {
-                    clearInterval(item.id);
+                switch (item.type) {
+                    case TimerType.timeout:
+                        clearTimeout(item.id);
+                        break;
+                    case TimerType.interval:
+                        clearInterval(item.id);
+                        break;
+                    default:
+                        throw new Error('SandboxTimer type should be enum TimerType');
+                        break;
                 }
             });
             delete this._sandbox[key];
